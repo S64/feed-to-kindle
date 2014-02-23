@@ -6,3 +6,7 @@ target/
 server/src/main/resources/properties/const.properties
 !server/src/main/resources/properties/conf.properties.example
 server/src/main/resources/properties/conf.properties
+!server/src/main/resources/properties/mail.properties.example
+server/src/main/resources/properties/mail.properties
+!server/src/main/resources/properties/checked_urls.json.example
+server/src/main/resources/properties/checked_urls.json
