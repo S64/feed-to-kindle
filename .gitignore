@@ -2,3 +2,7 @@ target/
 .classpath
 .project
 .settings/
+server/src/main/resources/properties/const.properties.example
+!server/src/main/resources/properties/const.properties
+server/src/main/resources/properties/conf.properties.example
+!server/src/main/resources/properties/conf.properties
