@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.google.gson.Gson;
@@ -17,7 +19,7 @@ public class Const extends LibConst {
 	private static final Properties propConst;
 	private static final Properties propConf;
 	
-	public static final List<String> FEEDS;
+	public static final Map<String,String> FEEDS;
 	
 	static {
 		{
@@ -32,13 +34,13 @@ public class Const extends LibConst {
 			e.printStackTrace();
 		}
 		{
-			final String str = propConf.getProperty("feed_list_json","[]");
-			Type type = new TypeToken<List<String>>(){}.getType();
-			List<String> urls = new Gson().fromJson(str,type);
+			final String str = propConf.getProperty("feed_list_json","{}");
+			Type type = new TypeToken<Map<String,String>>(){}.getType();
+			Map<String,String> urls = new Gson().fromJson(str,type);
 			if( urls != null )
 				FEEDS = urls;
 			else
-				FEEDS = new ArrayList<String>();
+				FEEDS = new HashMap<String, String>();
 		}
 	}
 	
