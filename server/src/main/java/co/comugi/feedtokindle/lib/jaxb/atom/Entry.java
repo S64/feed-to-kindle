@@ -1,5 +1,6 @@
 package co.comugi.feedtokindle.lib.jaxb.atom;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -16,7 +17,7 @@ public class Entry {
 	public String title;
 	
 	@XmlElement
-	public List<Link> links;
+	public List<Link> links = new ArrayList<Link>();
 	
 	@XmlElement(name="content")
 	public String content;

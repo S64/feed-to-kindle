@@ -4,6 +4,7 @@
   <artifactId>server</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>war</packaging>
+  <name>FeedToKindle Server</name>
   <dependencies>
     <dependency>
       <groupId>javax.ws.rs</groupId>
@@ -35,5 +36,30 @@
       <artifactId>gson</artifactId>
       <version>2.2.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
+      <version>2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>4.3.2</version>
+    </dependency>
   </dependencies>
+  <build>
+    <finalName>FeedToKindleServer</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+          <artifactId>tomcat7-maven-plugin</artifactId>
+           <version>2.1</version>
+           <configuration>
+             <server>localtomcat</server>
+             <port>8080</port>
+             <uriEncoding>UTF-8</uriEncoding>
+           </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

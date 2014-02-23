@@ -1,5 +1,6 @@
 package co.comugi.feedtokindle.lib.jaxb.atom;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -13,6 +14,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 public class Atom {
 	
 	@XmlElement
-	public List<Entry> entries;
+	public List<Entry> entries = new ArrayList<Entry>();
 	
 }

@@ -19,7 +19,10 @@ public class Const extends LibConst {
 	private static final Properties propConst;
 	private static final Properties propConf;
 	
+	public static final String READABILITY_API_BASE = "https://readability.com/api/";
+	
 	public static final Map<String,String> FEEDS;
+	public static final String READABILITY_API_TOKEN;
 	
 	static {
 		{
@@ -41,6 +44,9 @@ public class Const extends LibConst {
 				FEEDS = urls;
 			else
 				FEEDS = new HashMap<String, String>();
+		}
+		{
+			READABILITY_API_TOKEN = propConst.getProperty("readability_api_token");
 		}
 	}
 	
