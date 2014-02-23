@@ -10,11 +10,13 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 
-@XmlRootElement(name="feed")
+@XmlRootElement(name="feed",namespace="http://www.w3.org/2005/Atom")
 public class Atom {
 	
+	/*
 	@XmlAttribute(name="xmlns")
 	public final String xmlns = "http://www.w3.org/2005/Atom";
+	*/
 	
 	@XmlElement(name="title")
 	public String title;

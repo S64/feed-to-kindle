@@ -23,7 +23,7 @@ public class Application extends ResourceConfig {
 	
 	static {
 		checkMailService = Executors.newSingleThreadScheduledExecutor();
-		checkMailService.scheduleWithFixedDelay(new CheckMailRunnable(),1,Const.CHECK_RATE_MINUTE,TimeUnit.MINUTES);
+		checkMailService.scheduleWithFixedDelay(new CheckMailRunnable(),0l,Const.CHECK_RATE_MINUTE,TimeUnit.MINUTES);
 	}
 	
 	public Application() {

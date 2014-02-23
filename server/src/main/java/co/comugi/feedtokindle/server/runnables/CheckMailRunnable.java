@@ -4,10 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +26,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.ws.rs.core.MediaType;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyWebTarget;
@@ -32,6 +40,7 @@ import org.glassfish.jersey.client.JerseyWebTarget;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
+import com.sun.istack.internal.ByteArrayDataSource;
 
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -55,6 +64,9 @@ public class CheckMailRunnable implements Runnable {
 		}
 		final Session session = Session.getDefaultInstance(Const.propMail,new PlainAuthenticator(Const.propMail));
 		final JerseyClient client = JerseyClientBuilder.createClient();
+		{
+			session.setDebug(true);
+		}
 		for( final String key : Const.FEEDS.keySet() ) {
 			//final String feed = Const.FEEDS.get(key);
 			JerseyWebTarget target = client.target(Const.SERVER_URL_BASE+Const.SERVER_API_PREFIX+"feeds/single");
@@ -71,11 +83,19 @@ public class CheckMailRunnable implements Runnable {
 					final MimeBodyPart filePart;
 					{
 						bodyPart = new MimeBodyPart();
+						bodyPart.setText(" ");
 					}
 					{
 						filePart = new MimeBodyPart();
 						filePart.setFileName("attachment.html");
-						filePart.setDataHandler(new DataHandler( new URL(url) ));
+						final byte[] data;
+						{
+							final HttpClient hc = HttpClientBuilder.create().build();
+							HttpGet req = new HttpGet(url);
+							HttpResponse res = hc.execute(req);
+							data = EntityUtils.toByteArray(res.getEntity());
+						}
+						filePart.setDataHandler(new DataHandler(new ByteArrayDataSource(data,MediaType.TEXT_HTML)));
 					}
 					{
 						multiPart.addBodyPart(bodyPart);
@@ -83,7 +103,7 @@ public class CheckMailRunnable implements Runnable {
 					}
 					final MimeMessage msg = new MimeMessage(session);
 					{
-						msg.setFrom();
+						msg.setFrom( Const.propMail.getProperty("mail.smtp.from") );
 						msg.setRecipient(Message.RecipientType.TO,new InternetAddress( Const.KINDLE_PERSONAL_DOCUMENT_ADDRESS ));
 						msg.setSubject("Convert");
 						msg.setSentDate(new Date());
@@ -100,6 +120,9 @@ public class CheckMailRunnable implements Runnable {
 				} catch (MalformedURLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}
@@ -107,8 +130,10 @@ public class CheckMailRunnable implements Runnable {
 			File file = new File( CheckMailRunnable.class.getResource("/properties/checked_urls.json").toURI() );
 			if( !file.isFile() || !file.canWrite() )
 				file.createNewFile();
-			JsonWriter writer = new JsonWriter( new OutputStreamWriter( new FileOutputStream(file) ) );
-			new Gson().toJson(checkedUrls,type,writer);
+			String str = new Gson().toJson(checkedUrls,type);
+			FileWriter writer = new FileWriter(file);
+			writer.write(str);
+			writer.close();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -127,7 +152,7 @@ public class CheckMailRunnable implements Runnable {
 		private final String password;
 		
 		public PlainAuthenticator(Properties prop) {
-			username = prop.getProperty("mail.smtp.usernae");
+			username = prop.getProperty("mail.smtp.username");
 			password = prop.getProperty("mail.smtp.password");
 		}
 		

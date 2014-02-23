@@ -22,10 +22,9 @@ import co.comugi.feedtokindle.lib.jaxb.atom.Entry;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
-import com.itextpdf.text.html.simpleparser.HTMLWorker;
 
 @Path("/html")
-//@Produces(MediaType.TEXT_HTML)
+@Produces(MediaType.TEXT_HTML)
 public class HtmlResource {
 	
 	public static final Map<String,Entry> cache;
@@ -36,7 +35,7 @@ public class HtmlResource {
 	
 	@GET
 	@Path("/get.html")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	//@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public String get(@QueryParam("key") String key) {
 		if( !cache.containsKey(key) )
 			return null;
