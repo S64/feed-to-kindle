@@ -18,20 +18,27 @@ public class Const extends LibConst {
 
 	private static final Properties propConst;
 	private static final Properties propConf;
+	public static final Properties propMail;
 	
 	public static final String READABILITY_API_BASE = "https://readability.com/api/";
+	public static final String SERVER_API_PREFIX = "api/";
 	
 	public static final Map<String,String> FEEDS;
 	public static final String READABILITY_API_TOKEN;
+	public static final String SERVER_URL_BASE;
+	public static final long CHECK_RATE_MINUTE;
+	public static final String KINDLE_PERSONAL_DOCUMENT_ADDRESS;
 	
 	static {
 		{
 			propConst = new Properties();
 			propConf  = new Properties();
+			propMail  = new Properties();
 		}
 		try {
 			propConst.load( Const.class.getResourceAsStream("/properties/const.properties") );
 			propConf.load( Const.class.getResourceAsStream("/properties/conf.properties") );
+			propMail.load( Const.class.getResourceAsStream("/properties/mail.properties") );
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -47,6 +54,9 @@ public class Const extends LibConst {
 		}
 		{
 			READABILITY_API_TOKEN = propConst.getProperty("readability_api_token");
+			SERVER_URL_BASE = propConst.getProperty("server_url_base");
+			CHECK_RATE_MINUTE = Long.parseLong( propConst.getProperty("check_rate_minute",String.valueOf(5)) );
+			KINDLE_PERSONAL_DOCUMENT_ADDRESS = propConf.getProperty("kindle_personal_document");
 		}
 	}
 	
