@@ -42,8 +42,13 @@ public class HtmlResource {
 		final Entry entry = cache.get(key);
 		Document doc = Jsoup.parseBodyFragment( entry.content );
 		{
+			doc.outputSettings().charset("UTF-8");
+			doc.outputSettings().prettyPrint(true);
+		}
+		{
 			Element charset = new Element(Tag.valueOf("meta"),"");
-			charset.attr("charset","UTF-8");
+			charset.attr("http-equiv","Content-Type");
+			charset.attr("content","text/html; charset=utf-8");
 			doc.head().appendChild(charset);
 		}
 		{
@@ -51,7 +56,10 @@ public class HtmlResource {
 			title.text(entry.title);
 			doc.head().appendChild(title);
 		}
-		return doc.html();
+		StringBuilder builder = new StringBuilder();
+		builder.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
+		builder.append(doc.html());
+		return builder.toString();
 	}
 	
 	/*@GET

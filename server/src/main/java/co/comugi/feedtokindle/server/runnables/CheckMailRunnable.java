@@ -26,6 +26,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.http.HttpResponse;
@@ -65,7 +66,7 @@ public class CheckMailRunnable implements Runnable {
 		final Session session = Session.getDefaultInstance(Const.propMail,new PlainAuthenticator(Const.propMail));
 		final JerseyClient client = JerseyClientBuilder.createClient();
 		{
-			session.setDebug(true);
+			//session.setDebug(true);
 		}
 		for( final String key : Const.FEEDS.keySet() ) {
 			//final String feed = Const.FEEDS.get(key);
@@ -81,13 +82,10 @@ public class CheckMailRunnable implements Runnable {
 					final MimeMultipart multiPart = new MimeMultipart();
 					final MimeBodyPart bodyPart;
 					final MimeBodyPart filePart;
-					{
-						bodyPart = new MimeBodyPart();
-						bodyPart.setText(" ");
-					}
+					//final String text;
 					{
 						filePart = new MimeBodyPart();
-						filePart.setFileName("attachment.html");
+						filePart.setFileName( MimeUtility.encodeText(entry.title+".html","iso-2022-jp",null) );
 						final byte[] data;
 						{
 							final HttpClient hc = HttpClientBuilder.create().build();
@@ -95,7 +93,11 @@ public class CheckMailRunnable implements Runnable {
 							HttpResponse res = hc.execute(req);
 							data = EntityUtils.toByteArray(res.getEntity());
 						}
-						filePart.setDataHandler(new DataHandler(new ByteArrayDataSource(data,MediaType.TEXT_HTML)));
+						filePart.setDataHandler(new DataHandler(new ByteArrayDataSource(data,MediaType.APPLICATION_OCTET_STREAM)));
+					}
+					{
+						bodyPart = new MimeBodyPart();
+						bodyPart.setText(entry.title,"iso-2022-jp");
 					}
 					{
 						multiPart.addBodyPart(bodyPart);
