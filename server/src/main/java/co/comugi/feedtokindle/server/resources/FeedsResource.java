@@ -73,12 +73,12 @@ public class FeedsResource {
 			}
 			for( Item d : response.channel.items ){
 				final Entry entry = new Entry();
-				{
-					entry.title = d.title;
-				}
 				if( !rdbCacheByUrl.containsKey(d.link) ) {
 					JerseyWebTarget rApi = client.target( Const.READABILITY_API_BASE ).path("content/v1/parser");
 					ParserApiResponse parsed = rApi.queryParam("token",Const.READABILITY_API_TOKEN).queryParam("url",d.link).request().get(new GenericType<ParserApiResponse>(){});
+					{
+						entry.title = parsed.title;
+					}
 					final Document doc;
 					{
 						doc = Jsoup.parseBodyFragment(parsed.content,d.link);
