@@ -40,6 +40,7 @@ import co.comugi.feedtokindle.lib.jaxb.atom.Link;
 import co.comugi.feedtokindle.lib.jaxb.rss20.Item;
 import co.comugi.feedtokindle.lib.jaxb.rss20.Rss20;
 import co.comugi.feedtokindle.lib.readability.ParserApiResponse;
+import co.comugi.feedtokindle.server.AppServer;
 import co.comugi.feedtokindle.server.Const;
 
 @Path("/feeds")
@@ -50,12 +51,13 @@ public class FeedsResource {
 	
 	@GET
 	@Path("/single")
-	public Atom getFeed(@QueryParam("feed_id") String feedId) {
+	public Response getFeed(@QueryParam("feed_id") String feedId) {
 		final Atom r = new Atom();
+		final JerseyClient client = JerseyClientBuilder.createClient();
 		{
-			JerseyClient client = JerseyClientBuilder.createClient();
-			JerseyWebTarget target = client.target( Const.FEEDS.get(feedId) );
-			final Rss20 response = target.request(MediaType.APPLICATION_ATOM_XML).get(new GenericType<Rss20>(){});
+			final Rss20 response = AppServer.get().getRss20(client,Const.FEEDS.get(feedId));
+			if( response == null )
+				return Response.serverError().build();
 			{
 				r.title = response.channel.title;
 			}
@@ -74,8 +76,9 @@ public class FeedsResource {
 			for( Item d : response.channel.items ){
 				final Entry entry = new Entry();
 				if( !rdbCacheByUrl.containsKey(d.link) ) {
-					JerseyWebTarget rApi = client.target( Const.READABILITY_API_BASE ).path("content/v1/parser");
-					ParserApiResponse parsed = rApi.queryParam("token",Const.READABILITY_API_TOKEN).queryParam("url",d.link).request().get(new GenericType<ParserApiResponse>(){});
+					final ParserApiResponse parsed = AppServer.get().getParserApiResponse(client,d.link);
+					if( parsed == null )
+						continue;
 					{
 						entry.title = parsed.title;
 					}
@@ -101,6 +104,10 @@ public class FeedsResource {
 					}
 					rdbCacheByUrl.put(d.link,doc.body().html());
 				}
+				/*
+				if( !rdbCacheByUrl.containsKey(d.link) || rdbCacheByUrl.get(d.link) == null )
+					continue;
+				*/
 				{
 					entry.content = rdbCacheByUrl.get(d.link);
 				}
@@ -128,7 +135,7 @@ public class FeedsResource {
 				r.entries.add(entry);
 			}
 		}
-		return r;
+		return Response.ok(r).build();
 	}
 	
 }
